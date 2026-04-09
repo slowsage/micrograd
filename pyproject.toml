@@ -15,24 +15,40 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+rocm = [
+    "torch>=2.11.0",
+    "triton-rocm==3.6.0 ; sys_platform == 'linux'",
+]
+cuda = [
+    "torch>=2.11.0",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = [
-    "pytest",
-    "torch>=2.11.0",
-    "triton-rocm==3.6.0 ; sys_platform == 'linux'",
-]
+dev = ["pytest"]
+
+[tool.uv]
+conflicts = [[{ extra = "rocm" }, { extra = "cuda" }]]
 
 [tool.uv.sources]
-torch = { index = "pytorch-rocm" }
+torch = [
+    { index = "pytorch-rocm", extra = "rocm" },
+    { index = "pytorch-cuda", extra = "cuda" },
+]
 triton-rocm = { index = "pytorch-rocm" }
 
 [[tool.uv.index]]
 name = "pytorch-rocm"
 url = "https://download.pytorch.org/whl/rocm7.2"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cuda"
+url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
 [tool.hatch.build.targets.wheel]
