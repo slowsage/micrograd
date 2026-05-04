@@ -15,44 +15,41 @@ classifiers = [
 ]
 dependencies = []
 
-[project.optional-dependencies]
-rocm = [
-    "torch>=2.11.0 ; sys_platform == 'linux'",
-    "triton-rocm==3.6.0 ; sys_platform == 'linux'",
-]
-cuda = [
-    "torch>=2.11.0 ; sys_platform == 'linux' or sys_platform == 'win32'",
-]
-mps = [
-    "torch>=2.11.0 ; sys_platform == 'darwin'",
-]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["pytest"]
+dev  = ["pytest"]
+cpu  = ["torch>=2.11.0"]
+cuda = ["torch>=2.11.0"]
+rocm = ["torch>=2.11.0 ; sys_platform == 'linux'", "triton-rocm==3.6.0 ; sys_platform == 'linux'"]
 
 [tool.uv]
 python-preference = "managed"
-conflicts = [[{ extra = "rocm" }, { extra = "cuda" }, { extra = "mps" }]]
+conflicts = [[{ group = "cpu" }, { group = "cuda" }, { group = "rocm" }]]
 
 [tool.uv.sources]
 torch = [
-    { index = "pytorch-rocm", extra = "rocm" },
-    { index = "pytorch-cuda", extra = "cuda" },
+    { index = "rocm", group = "rocm" },
+    { index = "cuda", group = "cuda" },
+    { index = "cpu", group = "cpu" },
 ]
-triton-rocm = { index = "pytorch-rocm" }
+triton-rocm = { index = "rocm" }
 
 [[tool.uv.index]]
-name = "pytorch-rocm"
+name = "rocm"
 url = "https://download.pytorch.org/whl/rocm7.2"
 explicit = true
 
 [[tool.uv.index]]
-name = "pytorch-cuda"
+name = "cuda"
 url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "cpu"
+url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 [tool.hatch.build.targets.wheel]
