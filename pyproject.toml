@@ -17,11 +17,14 @@ dependencies = []
 
 [project.optional-dependencies]
 rocm = [
-    "torch>=2.11.0",
+    "torch>=2.11.0 ; sys_platform == 'linux'",
     "triton-rocm==3.6.0 ; sys_platform == 'linux'",
 ]
 cuda = [
-    "torch>=2.11.0",
+    "torch>=2.11.0 ; sys_platform == 'linux' or sys_platform == 'win32'",
+]
+mps = [
+    "torch>=2.11.0 ; sys_platform == 'darwin'",
 ]
 
 [build-system]
@@ -32,7 +35,8 @@ build-backend = "hatchling.build"
 dev = ["pytest"]
 
 [tool.uv]
-conflicts = [[{ extra = "rocm" }, { extra = "cuda" }]]
+python-preference = "managed"
+conflicts = [[{ extra = "rocm" }, { extra = "cuda" }, { extra = "mps" }]]
 
 [tool.uv.sources]
 torch = [
